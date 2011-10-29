@@ -3,5 +3,10 @@
 
     <string name="hello">Hello World, EyerisActivity!</string>
     <string name="app_name">Eyeris</string>
-
+    <string name="create_text">An intent filter of this kind causes an icon and label 
+        for the activity to be displayed in the application launcher, giving users a way to 
+        launch the activity and to return to the task that it creates any time after it has 
+        been launched. </string>
+    <string name="login_text">Go ahead and login fella</string>
+        
 </resources>
