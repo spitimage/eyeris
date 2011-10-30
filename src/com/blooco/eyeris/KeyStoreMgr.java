@@ -112,6 +112,12 @@ public class KeyStoreMgr
         }
     }
     
+    public void delete()
+    {
+        File file = new File(keystoreDirectory, keystoreFilename);
+        file.delete();
+    }
+    
     public void setPassword(String password)
     {
         this.password = password;

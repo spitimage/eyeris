@@ -11,6 +11,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -126,6 +128,33 @@ public class LoginActivity extends Activity
         }
         
         return createAlertDialog("Lost");
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, "Delete All Accounts");
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+        case 0:
+            KeyStoreMgr ksm = new KeyStoreMgr();
+            ksm.delete();
+
+            Intent intent = new Intent();
+            // Send back impotent signature manager
+            intent.putExtra("signatureMgr", new SignatureMgr());
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+
+        return super.onMenuItemSelected(featureId, item);
     }
 
 }
