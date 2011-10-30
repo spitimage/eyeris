@@ -38,23 +38,6 @@ public class LoginActivity extends Activity
             }
 
         });
-
-        Button cancel = (Button) findViewById(R.id.login_cancel);
-        cancel.setOnClickListener(new OnClickListener()
-        {
-
-            public void onClick(View arg0)
-            {
-                cancel();
-            }
-
-        });
-    }
-
-    private void cancel()
-    {
-        setResult(RESULT_CANCELED);
-        finish();
     }
 
     private void ok()
@@ -73,13 +56,10 @@ public class LoginActivity extends Activity
             KeyStore ks = ksm.get();
             SignatureMgr signatureMgr = new SignatureMgr();
             signatureMgr.init(ks, alias, password);
-
-            Intent intent = new Intent();
+            
+            Intent intent = new Intent(this, ScanActivity.class);
             intent.putExtra("signatureMgr", signatureMgr);
-
-            setResult(RESULT_OK, intent);
-            finish();
-
+            startActivity(intent);
         }
         catch (KeyStoreException e)
         {
@@ -147,11 +127,8 @@ public class LoginActivity extends Activity
             KeyStoreMgr ksm = new KeyStoreMgr();
             ksm.delete();
 
-            Intent intent = new Intent();
-            // Send back impotent signature manager
-            intent.putExtra("signatureMgr", new SignatureMgr());
-            setResult(RESULT_OK, intent);
-            finish();
+            Intent intent = new Intent(this, EyerisActivity.class);
+            startActivity(intent);
         }
 
         return super.onMenuItemSelected(featureId, item);

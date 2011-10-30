@@ -33,8 +33,7 @@ public class ScanActivity extends Activity
         {
         case 0:
             signatureMgr = null;
-            Intent intent = new Intent(this, EyerisActivity.class);
-            intent.putExtra("logout", true);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
 

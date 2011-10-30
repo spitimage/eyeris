@@ -38,15 +38,9 @@ public class CreateAccountActivity extends Activity
                 progressDialog.dismiss();
             }
 
-            Intent intent = null;
-            if (signatureMgr != null)
-            {
-                intent = new Intent();
-                intent.putExtra("signatureMgr", signatureMgr);
-            }
-
-            setResult(msg.arg1, intent);
-            finish();
+            Intent intent = new Intent(CreateAccountActivity.this, ScanActivity.class);
+            intent.putExtra("signatureMgr", signatureMgr);
+            startActivity(intent);
         }
     };
 
@@ -63,17 +57,6 @@ public class CreateAccountActivity extends Activity
             public void onClick(View arg0)
             {
                 ok();
-            }
-
-        });
-
-        Button cancel = (Button) findViewById(R.id.create_cancel);
-        cancel.setOnClickListener(new OnClickListener()
-        {
-
-            public void onClick(View arg0)
-            {
-                cancel();
             }
 
         });
@@ -163,9 +146,4 @@ public class CreateAccountActivity extends Activity
         return wr.toString();
     }
     
-    private void cancel()
-    {
-        setResult(RESULT_CANCELED);
-        finish();        
-    }
 }
