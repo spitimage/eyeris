@@ -67,6 +67,17 @@ public class CreateAccountActivity extends Activity
 
         });
 
+        Button cancel = (Button) findViewById(R.id.create_cancel);
+        cancel.setOnClickListener(new OnClickListener()
+        {
+
+            public void onClick(View arg0)
+            {
+                cancel();
+            }
+
+        });
+
     }
 
     private class CertCreateThread extends Thread
@@ -150,5 +161,11 @@ public class CreateAccountActivity extends Activity
         wr.write(certString);
         wr.write("-----END CERTIFICATE-----\n");
         return wr.toString();
+    }
+    
+    private void cancel()
+    {
+        setResult(RESULT_CANCELED);
+        finish();        
     }
 }
