@@ -26,7 +26,14 @@ public class SignatureMgr implements Serializable
         Log.i(TAG, "Looking up private key for alias " + alias);
         PasswordProtection pwp = new PasswordProtection(password.toCharArray());
         PrivateKeyEntry entry = (PrivateKeyEntry) ks.getEntry(alias, pwp);
-        privateKey = entry.getPrivateKey();        
+        if (entry != null)
+        {
+            privateKey = entry.getPrivateKey();       
+        }
+        else
+        {
+            throw new KeyStoreException();
+        }
     }
 
     public String sign(String content) throws NoSuchAlgorithmException, InvalidKeyException,

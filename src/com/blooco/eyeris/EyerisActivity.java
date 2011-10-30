@@ -11,7 +11,7 @@ import android.os.Bundle;
 public class EyerisActivity extends Activity
 {
     private SignatureMgr signatureMgr = null;
-    
+
     enum Target
     {
         CREATE_ACCOUNT, LOGIN
@@ -22,6 +22,17 @@ public class EyerisActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        // Check for a logout
+        if (getIntent().getExtras() != null)
+        {
+            boolean logout = getIntent().getExtras().getBoolean("logout", false);
+            if (logout)
+            {
+                signatureMgr = null;
+            }
+        }
+
         doStateTransition();
     }
 
@@ -75,38 +86,41 @@ public class EyerisActivity extends Activity
             {
                 signatureMgr = (SignatureMgr) data.getSerializableExtra("signatureMgr");
             }
-            
-        }
-        else if (requestCode == Target.CREATE_ACCOUNT.ordinal())
-        {
-            if (resultCode == RESULT_OK)
-            {
-                signatureMgr = (SignatureMgr) data.getSerializableExtra("signatureMgr");
-                doStateTransition();
-            }
             else
             {
                 showDialog(0);
             }
-            
+
         }
-        
+        else
+            if (requestCode == Target.CREATE_ACCOUNT.ordinal())
+            {
+                if (resultCode == RESULT_OK)
+                {
+                    signatureMgr = (SignatureMgr) data.getSerializableExtra("signatureMgr");
+                }
+                else
+                {
+                    showDialog(0);
+                }
+
+            }
+
     }
-    
+
     private Dialog createAlertDialog(String msg)
     {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setMessage(msg);
         dialog.setButton("Ok", new OnClickListener()
-        {            
+        {
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss();
                 doStateTransition();
             }
         });
-        
-        
+
         return dialog;
     }
 
@@ -116,7 +130,4 @@ public class EyerisActivity extends Activity
         return createAlertDialog("Bad things happened");
     }
 
-
-    
-    
 }
