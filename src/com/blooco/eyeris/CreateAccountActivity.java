@@ -8,7 +8,10 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +39,12 @@ public class CreateAccountActivity extends Activity
             if (progressDialog != null)
             {
                 progressDialog.dismiss();
+            }
+            
+            if (msg.arg1 != RESULT_OK)
+            {
+                showDialog(0);
+                return;
             }
 
             Intent intent = new Intent(CreateAccountActivity.this, ScanActivity.class);
@@ -65,7 +74,6 @@ public class CreateAccountActivity extends Activity
 
     private class CertCreateThread extends Thread
     {
-
         @Override
         public void run()
         {
@@ -145,5 +153,34 @@ public class CreateAccountActivity extends Activity
         wr.write("-----END CERTIFICATE-----\n");
         return wr.toString();
     }
+    
+    private Dialog createAlertDialog(String msg)
+    {
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setMessage(msg);
+        dialog.setButton("Ok", new android.content.DialogInterface.OnClickListener()
+        {            
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
+        
+        
+        return dialog;
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        switch (id){
+            case 0:
+                return createAlertDialog("Bad things happened");
+        }
+        
+        return createAlertDialog("Lost");
+    }
+    
+
     
 }
