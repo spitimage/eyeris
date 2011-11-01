@@ -124,6 +124,7 @@ public class LoginActivity extends Activity
         switch (item.getItemId())
         {
         case 0:
+            // TODO Notify the server of the removal
             KeyStoreMgr ksm = new KeyStoreMgr();
             ksm.delete();
 

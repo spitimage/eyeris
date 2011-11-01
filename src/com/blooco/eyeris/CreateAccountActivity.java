@@ -72,6 +72,16 @@ public class CreateAccountActivity extends Activity
         });
 
     }
+    
+    private class DuplicateRegistrationException extends Exception
+    {
+        private static final long serialVersionUID = 1L;
+
+        DuplicateRegistrationException(String reason)
+        {
+            super(reason);
+        }
+    }
 
     private class CertCreateThread extends Thread
     {
@@ -111,6 +121,14 @@ public class CreateAccountActivity extends Activity
                 msg.arg1 = RESULT_OK;
                 handler.sendMessage(msg);
             }
+            catch (DuplicateRegistrationException e)
+            {
+                // TODO Notify user this is a duplicate registration
+                e.printStackTrace();
+                Message msg = Message.obtain();
+                msg.arg1 = RESULT_CANCELED;
+                handler.sendMessage(msg);
+            }
             catch (Exception e)
             {
                 e.printStackTrace();
@@ -134,7 +152,7 @@ public class CreateAccountActivity extends Activity
 
     }
 
-    private void registerCert(String subject, Certificate cert) throws CertificateEncodingException, IOException
+    private void registerCert(String subject, Certificate cert) throws CertificateEncodingException, IOException, DuplicateRegistrationException
     {
         String certString = encodeCert(cert);
         Log.d(TAG, "Cert: " + certString);
@@ -143,6 +161,11 @@ public class CreateAccountActivity extends Activity
         params.put("cert", certString);
         int result = NetworkMgr.post("http://192.168.1.106:8000/register/", null, params, null);
         Log.i(TAG, "Register return value = " + result);
+        if (result != 200)
+        {
+            throw new DuplicateRegistrationException("Return code: " + result);
+        }
+        
     }
 
     public String encodeCert(Certificate cert) throws CertificateEncodingException, IOException

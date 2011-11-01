@@ -20,12 +20,14 @@ public class SignatureMgr implements Serializable
     private static final long serialVersionUID = 1L;
     static private String TAG = "SignatureMgr";
     private PrivateKey privateKey = null;
+    private String subject = null;
     
     public void init(KeyStore ks, String alias, String password) throws NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException
     {
         Log.i(TAG, "Looking up private key for alias " + alias);
         PasswordProtection pwp = new PasswordProtection(password.toCharArray());
         PrivateKeyEntry entry = (PrivateKeyEntry) ks.getEntry(alias, pwp);
+        subject = alias;
         if (entry != null)
         {
             privateKey = entry.getPrivateKey();       
@@ -44,11 +46,21 @@ public class SignatureMgr implements Serializable
             Log.e(TAG, "Attempted to sign without initializing signature manager");
             throw new InvalidKeyException();
         }
-        Signature signature = Signature.getInstance("RSA");
+        Signature signature = Signature.getInstance("SHA1WithRSA");
         signature.initSign(privateKey);
         signature.update(content.getBytes());
         byte[] bytes = signature.sign();
         return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    public PrivateKey getPrivateKey()
+    {
+        return privateKey;
+    }
+
+    public String getSubject()
+    {
+        return subject;
     }
 
 }
