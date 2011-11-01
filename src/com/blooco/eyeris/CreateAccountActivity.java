@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -97,7 +98,7 @@ public class CreateAccountActivity extends Activity
                 cm.setPassword(pw);
                 Certificate cert = cm.create(ks);
 
-                registerCert(cert);
+                registerCert(alias, cert);
 
                 // Once registered, we can save the keystore to permanent
                 // storage
@@ -133,11 +134,15 @@ public class CreateAccountActivity extends Activity
 
     }
 
-    private void registerCert(Certificate cert) throws CertificateEncodingException, IOException
+    private void registerCert(String subject, Certificate cert) throws CertificateEncodingException, IOException
     {
         String certString = encodeCert(cert);
         Log.d(TAG, "Cert: " + certString);
-
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("subject", subject);
+        params.put("cert", certString);
+        int result = NetworkMgr.post("http://192.168.1.106:8000/register/", null, params, null);
+        Log.i(TAG, "Register return value = " + result);
     }
 
     public String encodeCert(Certificate cert) throws CertificateEncodingException, IOException
