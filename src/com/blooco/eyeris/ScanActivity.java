@@ -49,8 +49,9 @@ public class ScanActivity extends Activity
             // TODO Generate a real nonce
             String nonce = Long.toHexString(new Date().getTime());
             String subject = signatureMgr.getSubject();
-            String content = "Some Content Here";
+            String content = "resource1";
             String signature = signatureMgr.sign(content+nonce);
+            Log.d(TAG, "Produced Signature: " + signature);
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("nonce", nonce);
             params.put("subject", subject);
