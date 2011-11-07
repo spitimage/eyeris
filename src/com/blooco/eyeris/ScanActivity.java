@@ -1,14 +1,12 @@
 package com.blooco.eyeris;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,6 +44,11 @@ public class ScanActivity extends Activity
     {
         try
         {
+            if (signatureMgr == null)
+            {
+                Log.e(TAG, "Signature manager is null");
+                throw new EyerisException("An initialization error has occurred");
+            }
             // TODO Generate a real nonce
             String nonce = Long.toHexString(new Date().getTime());
             String subject = signatureMgr.getSubject();
@@ -61,36 +64,19 @@ public class ScanActivity extends Activity
             Log.i(TAG, "Signature return value = " + result);
             if (result != 200)
             {
-                throw new SignatureException();
+                String msg = "Unexpected result from signature server";
+                Log.e(TAG, msg);
+                throw new EyerisException(msg);
             }
 
         }
-        catch (InvalidKeyException e)
+        catch (EyerisException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Bundle bundle = new Bundle();
+            bundle.putString("message", e.getLocalizedMessage());
+            removeDialog(0);
+            showDialog(0, bundle);
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (SignatureException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (MalformedURLException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
     }
 
     @Override
@@ -114,4 +100,21 @@ public class ScanActivity extends Activity
 
         return super.onMenuItemSelected(featureId, item);
     }
+    
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle bundle)
+    {
+        AlertDialog dialog = new AlertDialog.Builder(this).create();
+        dialog.setMessage(bundle.getString("message"));
+        dialog.setButton("Ok", new android.content.DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
+
+        return dialog;
+    }
+
 }

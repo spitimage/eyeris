@@ -21,36 +21,82 @@ public class SignatureMgr implements Serializable
     static private String TAG = "SignatureMgr";
     private PrivateKey privateKey = null;
     private String subject = null;
-    
-    public void init(KeyStore ks, String alias, String password) throws NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException
+
+    public void init(KeyStore ks, String alias, String password) throws EyerisException
     {
-        Log.i(TAG, "Looking up private key for alias " + alias);
-        PasswordProtection pwp = new PasswordProtection(password.toCharArray());
-        PrivateKeyEntry entry = (PrivateKeyEntry) ks.getEntry(alias, pwp);
-        subject = alias;
-        if (entry != null)
+        try
         {
-            privateKey = entry.getPrivateKey();       
+            Log.i(TAG, "Looking up private key for alias " + alias);
+            PasswordProtection pwp = new PasswordProtection(password.toCharArray());
+            PrivateKeyEntry entry = (PrivateKeyEntry) ks.getEntry(alias, pwp);
+            subject = alias;
+            if (entry != null)
+            {
+                privateKey = entry.getPrivateKey();
+            }
+            else
+            {
+                Log.e(TAG, "No private key for " + alias);
+                throw new EyerisException("Unable to find key for user " + alias);
+            }
         }
-        else
+        catch (NoSuchAlgorithmException e)
         {
-            throw new KeyStoreException();
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
+
+        }
+        catch (UnrecoverableEntryException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
+        }
+        catch (KeyStoreException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
         }
     }
 
-    public String sign(String content) throws NoSuchAlgorithmException, InvalidKeyException,
-            SignatureException
+    public String sign(String content) throws EyerisException
     {
-        if (null == privateKey)
+        String ret = "";
+        try
         {
-            Log.e(TAG, "Attempted to sign without initializing signature manager");
-            throw new InvalidKeyException();
+            if (null == privateKey)
+            {
+                Log.e(TAG, "Attempted to sign without initializing signature manager");
+                String msg = "There was a problem creating the signature.";
+                throw new EyerisException(msg);
+            }
+            Signature signature = Signature.getInstance("SHA1WithRSA");
+            signature.initSign(privateKey);
+            signature.update(content.getBytes());
+            byte[] bytes = signature.sign();
+            ret = Base64.encodeToString(bytes, Base64.DEFAULT);
         }
-        Signature signature = Signature.getInstance("SHA1WithRSA");
-        signature.initSign(privateKey);
-        signature.update(content.getBytes());
-        byte[] bytes = signature.sign();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+        catch (NoSuchAlgorithmException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
+        }
+        catch (InvalidKeyException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
+        }
+        catch (SignatureException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            String msg = "There was a problem creating the signature.";
+            throw new EyerisException(msg);
+        }
+        return ret;
     }
 
     public PrivateKey getPrivateKey()

@@ -10,8 +10,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import android.util.Log;
+
 public class NetworkMgr
 {
+    private static final String TAG = "NetworkMgr";
+
     /**
      * perform an Http POST to the supplied urlString with the supplied
      * requestHeaders and formParameters
@@ -32,78 +36,93 @@ public class NetworkMgr
      * @throws IOException
      *             reports I/O sending and/or retrieving data over Http
      */
-    public static int post(String urlString, Map<String, String> requestHeaders, Map<String, String> formParameters,
-            String requestContents) throws MalformedURLException, IOException
+    public static int post(String urlString, Map<String, String> requestHeaders,
+            Map<String, String> formParameters, String requestContents) throws EyerisException
     {
-        // open url connection
-        URL url = new URL(urlString);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        // set up url connection to post information and
-        // retrieve information back
-        con.setRequestMethod("POST");
-        con.setDoInput(true);
-        con.setDoOutput(true);
-
-        // add all the request headers
-        if (requestHeaders != null)
-        {
-            Set<String> headers = requestHeaders.keySet();
-            for (Iterator<String> it = headers.iterator(); it.hasNext();)
-            {
-                String headerName = it.next();
-                String headerValue = requestHeaders.get(headerName);
-                con.setRequestProperty(headerName, headerValue);
-            }
-        }
-
-        // add url form parameters
-        DataOutputStream ostream = null;
+        int ret = 0;
         try
         {
-            ostream = new DataOutputStream(con.getOutputStream());
-            if (formParameters != null)
-            {
-                Set<String> parameters = formParameters.keySet();
-                Iterator<String> it = parameters.iterator();
-                StringBuffer buf = new StringBuffer();
+            // open url connection
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-                for (int i = 0; it.hasNext(); i++)
+            // set up url connection to post information and
+            // retrieve information back
+            con.setRequestMethod("POST");
+            con.setDoInput(true);
+            con.setDoOutput(true);
+
+            // add all the request headers
+            if (requestHeaders != null)
+            {
+                Set<String> headers = requestHeaders.keySet();
+                for (Iterator<String> it = headers.iterator(); it.hasNext();)
                 {
-                    String parameterName = it.next();
-                    String parameterValue = formParameters.get(parameterName);
-
-                    if (parameterValue != null)
-                    {
-                        parameterValue = URLEncoder.encode(parameterValue);
-                        if (i > 0)
-                        {
-                            buf.append("&");
-                        }
-                        buf.append(parameterName);
-                        buf.append("=");
-                        buf.append(parameterValue);
-                    }
+                    String headerName = it.next();
+                    String headerValue = requestHeaders.get(headerName);
+                    con.setRequestProperty(headerName, headerValue);
                 }
-                ostream.writeBytes(buf.toString());
             }
 
-            if (requestContents != null)
+            // add url form parameters
+            DataOutputStream ostream = null;
+            try
             {
-                ostream.writeBytes(requestContents);
+                ostream = new DataOutputStream(con.getOutputStream());
+                if (formParameters != null)
+                {
+                    Set<String> parameters = formParameters.keySet();
+                    Iterator<String> it = parameters.iterator();
+                    StringBuffer buf = new StringBuffer();
+
+                    for (int i = 0; it.hasNext(); i++)
+                    {
+                        String parameterName = it.next();
+                        String parameterValue = formParameters.get(parameterName);
+
+                        if (parameterValue != null)
+                        {
+                            parameterValue = URLEncoder.encode(parameterValue);
+                            if (i > 0)
+                            {
+                                buf.append("&");
+                            }
+                            buf.append(parameterName);
+                            buf.append("=");
+                            buf.append(parameterValue);
+                        }
+                    }
+                    ostream.writeBytes(buf.toString());
+                }
+
+                if (requestContents != null)
+                {
+                    ostream.writeBytes(requestContents);
+                }
+
+            }
+            finally
+            {
+                if (ostream != null)
+                {
+                    ostream.flush();
+                    ostream.close();
+                }
             }
 
+            ret = con.getResponseCode();
         }
-        finally
+        catch (MalformedURLException e)
         {
-            if (ostream != null)
-            {
-                ostream.flush();
-                ostream.close();
-            }
+            Log.e(TAG, "Malformed URL: " + urlString);
+            throw new EyerisException("Unable to make network connection.");
         }
-
-        return con.getResponseCode();
+        catch (IOException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            throw new EyerisException("Unable to make network connection.");
+        }
+        
+        return ret;
     }
-
 }

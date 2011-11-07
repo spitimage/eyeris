@@ -36,15 +36,18 @@ public class CreateAccountActivity extends Activity
         @Override
         public void handleMessage(Message msg)
         {
- 
+
             if (progressDialog != null)
             {
                 progressDialog.dismiss();
             }
-            
+
             if (msg.arg1 != RESULT_OK)
             {
-                showDialog(0);
+                Bundle bundle = new Bundle();
+                bundle.putString("message", (String)msg.obj);
+                removeDialog(0);
+                showDialog(0, bundle);
                 return;
             }
 
@@ -71,16 +74,6 @@ public class CreateAccountActivity extends Activity
 
         });
 
-    }
-    
-    private class DuplicateRegistrationException extends Exception
-    {
-        private static final long serialVersionUID = 1L;
-
-        DuplicateRegistrationException(String reason)
-        {
-            super(reason);
-        }
     }
 
     private class CertCreateThread extends Thread
@@ -121,19 +114,12 @@ public class CreateAccountActivity extends Activity
                 msg.arg1 = RESULT_OK;
                 handler.sendMessage(msg);
             }
-            catch (DuplicateRegistrationException e)
-            {
-                // TODO Notify user this is a duplicate registration
-                e.printStackTrace();
-                Message msg = Message.obtain();
-                msg.arg1 = RESULT_CANCELED;
-                handler.sendMessage(msg);
-            }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // Pass off the exception to the UI thread
                 Message msg = Message.obtain();
                 msg.arg1 = RESULT_CANCELED;
+                msg.obj = e.getLocalizedMessage();
                 handler.sendMessage(msg);
             }
         }
@@ -141,74 +127,91 @@ public class CreateAccountActivity extends Activity
 
     private void ok()
     {
-
         progressDialog = ProgressDialog.show(this, null, "Creating and registering certificate...");
         new CertCreateThread().start();
     }
 
-    private void validateParams(String alias, String pw)
+    private void validateParams(String alias, String pw) throws EyerisException
     {
-        // TODO Auto-generated method stub
-
+        
+//        if (alias.length() < 8)
+//        {
+//            throw new EyerisException("Invalid username");
+//        }
+//        if (pw.length() < 8)
+//        {
+//            throw new EyerisException("Invalid password");
+//        }
     }
 
-    private void registerCert(String subject, Certificate cert) throws CertificateEncodingException, IOException, DuplicateRegistrationException
+    private void registerCert(String subject, Certificate cert) throws EyerisException
     {
-        String certString = encodeCert(cert);
+        String certString;
+        certString = encodeCert(cert);
         Log.d(TAG, "Cert: " + certString);
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("subject", subject);
         params.put("cert", certString);
         int result = NetworkMgr.post("http://192.168.1.106:8000/register/", null, params, null);
         Log.i(TAG, "Register return value = " + result);
+        if (result == 403)
+        {
+            String msg = "Username " + subject
+                    + " is already registered. Please select a different username.";
+            Log.d(TAG, msg);
+            throw new EyerisException(msg);
+        }
+
         if (result != 200)
         {
-            throw new DuplicateRegistrationException("Return code: " + result);
+            String msg = "A network error has occurred.";
+            Log.d(TAG, msg);
+            throw new EyerisException(msg);
         }
-        
     }
 
-    public String encodeCert(Certificate cert) throws CertificateEncodingException, IOException
+    public String encodeCert(Certificate cert) throws EyerisException
     {
-        // Get the encoded form which is suitable for exporting
-        byte[] buf = cert.getEncoded();
-        String certString = Base64.encodeToString(buf, Base64.DEFAULT);
+        String ret = "";
+        try
+        {
+            // Get the encoded form which is suitable for exporting
+            byte[] buf = cert.getEncoded();
+            String certString = Base64.encodeToString(buf, Base64.DEFAULT);
 
-        // Write in text form
-        Writer wr = new StringWriter();
-        wr.write("-----BEGIN CERTIFICATE-----\n");
-        wr.write(certString);
-        wr.write("-----END CERTIFICATE-----\n");
-        return wr.toString();
+            // Write in text form
+            Writer wr = new StringWriter();
+            wr.write("-----BEGIN CERTIFICATE-----\n");
+            wr.write(certString);
+            wr.write("-----END CERTIFICATE-----\n");
+            ret = wr.toString();
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            throw new EyerisException("Unable to encode certificate.");
+        }
+        catch (CertificateEncodingException e)
+        {
+            Log.e(TAG, e.getLocalizedMessage());
+            throw new EyerisException("Unable to encode certificate.");
+        }
+        return ret;
     }
-    
-    private Dialog createAlertDialog(String msg)
+
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle bundle)
     {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setMessage(msg);
+        dialog.setMessage(bundle.getString("message"));
         dialog.setButton("Ok", new android.content.DialogInterface.OnClickListener()
-        {            
+        {
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss();
             }
         });
-        
-        
+
         return dialog;
     }
-
-    @Override
-    protected Dialog onCreateDialog(int id)
-    {
-        switch (id){
-            case 0:
-                return createAlertDialog("Bad things happened");
-        }
-        
-        return createAlertDialog("Lost");
-    }
-    
-
-    
 }

@@ -63,51 +63,55 @@ public class LoginActivity extends Activity
         }
         catch (KeyStoreException e)
         {
-            Log.i(TAG, "KeyStoreException");
+            Log.i(TAG, e.getLocalizedMessage());
             // Assume this is a failed authentication
-            showDialog(0);
+            Bundle bundle = new Bundle();
+            bundle.putString("message", "Invalid Login");
+            removeDialog(0);
+            showDialog(0, bundle);
         }
         catch (IOException e)
         {
-            Log.i(TAG, "IOException");
+            Log.i(TAG, e.getLocalizedMessage());
             // Strangely this is what happens when the keystore password fails!
-            showDialog(0);
+            Bundle bundle = new Bundle();
+            bundle.putString("message", "Invalid Login");
+            removeDialog(0);
+            showDialog(0, bundle);
+        }
+        catch (EyerisException e)
+        {
+            Log.i(TAG, e.getLocalizedMessage());
+            Bundle bundle = new Bundle();
+            bundle.putString("message", e.getLocalizedMessage());
+            removeDialog(0);
+            showDialog(0, bundle);
         }
         catch (Exception e)
         {
-            Log.i(TAG, "Other Exception");
-            // Some other error
-            showDialog(1); 
+            Log.i(TAG, e.getLocalizedMessage());
+            // Strangely this is what happens when the keystore password fails!
+            Bundle bundle = new Bundle();
+            bundle.putString("message", "An unexpected error has occurred");
+            removeDialog(0);
+            showDialog(0, bundle);
         }
     }
-    
-    private Dialog createAlertDialog(String msg)
+
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle bundle)
     {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setMessage(msg);
+        dialog.setMessage(bundle.getString("message"));
         dialog.setButton("Ok", new android.content.DialogInterface.OnClickListener()
-        {            
+        {
             public void onClick(DialogInterface dialog, int which)
             {
                 dialog.dismiss();
             }
         });
-        
-        
-        return dialog;
-    }
 
-    @Override
-    protected Dialog onCreateDialog(int id)
-    {
-        switch (id){
-            case 0:
-                return createAlertDialog("Invalid Login Attempt");
-            case 1:
-                return createAlertDialog("Bad things happened");
-        }
-        
-        return createAlertDialog("Lost");
+        return dialog;
     }
     
     @Override
