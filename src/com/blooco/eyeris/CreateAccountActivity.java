@@ -152,7 +152,7 @@ public class CreateAccountActivity extends Activity
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("subject", subject);
         params.put("cert", certString);
-        int result = NetworkMgr.post("http://192.168.1.106:8000/register/", null, params, null);
+        int result = NetworkMgr.post(getString(R.string.register_url), null, params, null);
         Log.i(TAG, "Register return value = " + result);
         if (result == 403)
         {

@@ -60,7 +60,7 @@ public class ScanActivity extends Activity
             params.put("subject", subject);
             params.put("content", content);
             params.put("signature", signature);
-            int result = NetworkMgr.post("http://192.168.1.106:8000/authorize/", null, params, null);
+            int result = NetworkMgr.post(getString(R.string.auth_url), null, params, null);
             Log.i(TAG, "Signature return value = " + result);
             if (result != 200)
             {
