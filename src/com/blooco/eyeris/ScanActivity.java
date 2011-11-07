@@ -62,6 +62,14 @@ public class ScanActivity extends Activity
             params.put("signature", signature);
             int result = NetworkMgr.post(getString(R.string.auth_url), null, params, null);
             Log.i(TAG, "Signature return value = " + result);
+            
+            if (result == 403)
+            {
+                String msg = "Not authorized";
+                Log.i(TAG, "Attempted unauthorized access: " + subject + " for " + content);
+                throw new EyerisException(msg);
+                
+            }
             if (result != 200)
             {
                 String msg = "Unexpected result from signature server";
