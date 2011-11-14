@@ -43,6 +43,7 @@ public class NetworkMgr
         try
         {
             // open url connection
+            Log.d(TAG, "Opening connection to " + urlString);
             URL url = new URL(urlString);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -82,6 +83,7 @@ public class NetworkMgr
 
                         if (parameterValue != null)
                         {
+                            Log.d(TAG, "Adding param: " + parameterValue);
                             parameterValue = URLEncoder.encode(parameterValue);
                             if (i > 0)
                             {

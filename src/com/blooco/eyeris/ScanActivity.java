@@ -21,6 +21,7 @@ public class ScanActivity extends Activity
 {
     private static String TAG = "ScanActivity";
     private SignatureMgr signatureMgr = null;
+    private boolean error = false;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -35,10 +36,46 @@ public class ScanActivity extends Activity
 
             public void onClick(View arg0)
             {
-                scan();
+                startZxing();
             }
 
         });
+        
+        startZxing();
+        
+    }
+    
+    private void startZxing()
+    {
+        if (error)
+        {
+            return;
+        }
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.initiateScan();
+    }
+    
+    @Override
+    protected void onResume()
+    {
+        startZxing();
+        super.onResume();
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (result != null)
+        {
+            Log.d(TAG, "Scan Contents: " + result.getContents());
+            Log.d(TAG, "Scan Format Name: " + result.getFormatName());
+            if (result.getContents() != null)
+            {
+                scan(result.getContents());
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, intent);
     }
     
     protected void go_to_url(String url)
@@ -48,19 +85,20 @@ public class ScanActivity extends Activity
         startActivity(intent);        
     }
 
-    protected void scan()
+    protected void scan(String content)
     {
         try
         {
             if (signatureMgr == null)
             {
-                Log.e(TAG, "Signature manager is null");
-                throw new EyerisException("An initialization error has occurred");
+                Log.i(TAG, "Signature manager is null");
+                // Go back to login
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
             }
             // TODO Generate a real nonce
             String nonce = Long.toHexString(new Date().getTime());
             String subject = signatureMgr.getSubject();
-            String content = "http://blooco.com";
             String signature = signatureMgr.sign(content+nonce);
             Log.d(TAG, "Produced Signature: " + signature);
             HashMap<String, String> params = new HashMap<String, String>();
@@ -82,7 +120,7 @@ public class ScanActivity extends Activity
             {
                 String msg = "Unexpected result from signature server";
                 Log.e(TAG, msg);
-                throw new EyerisException(msg);
+                throw new EyerisException(msg); 
             }
             
             go_to_url(getString(R.string.log_url) + subject + '/');
@@ -90,6 +128,7 @@ public class ScanActivity extends Activity
         }
         catch (EyerisException e)
         {
+            error = true;
             Bundle bundle = new Bundle();
             bundle.putString("message", e.getLocalizedMessage());
             removeDialog(0);
@@ -128,6 +167,7 @@ public class ScanActivity extends Activity
         {
             public void onClick(DialogInterface dialog, int which)
             {
+                error = false;
                 dialog.dismiss();
             }
         });
