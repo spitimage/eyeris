@@ -27,8 +27,7 @@
             android:name=".LoginActivity"
             android:noHistory="true" />
         <activity
-            android:name=".ScanActivity"
-            android:noHistory="true" />
+            android:name=".ScanActivity"/>
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

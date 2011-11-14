@@ -8,5 +8,7 @@
     <string name="login_text">Go ahead and login fella</string>
     <string name="register_url">http://192.168.1.100:8000/register/</string>
     <string name="auth_url">http://192.168.1.100:8000/authorize/</string>
-
+    <string name="scan_url">http://192.168.1.100:8000/scan/</string>
+    <string name="log_url">http://192.168.1.100:8000/log/</string>
+        
 </resources>

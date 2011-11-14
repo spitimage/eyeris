@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -39,6 +40,13 @@ public class ScanActivity extends Activity
 
         });
     }
+    
+    protected void go_to_url(String url)
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        startActivity(intent);        
+    }
 
     protected void scan()
     {
@@ -52,7 +60,7 @@ public class ScanActivity extends Activity
             // TODO Generate a real nonce
             String nonce = Long.toHexString(new Date().getTime());
             String subject = signatureMgr.getSubject();
-            String content = "resource1";
+            String content = "http://blooco.com";
             String signature = signatureMgr.sign(content+nonce);
             Log.d(TAG, "Produced Signature: " + signature);
             HashMap<String, String> params = new HashMap<String, String>();
@@ -60,7 +68,7 @@ public class ScanActivity extends Activity
             params.put("subject", subject);
             params.put("content", content);
             params.put("signature", signature);
-            int result = NetworkMgr.post(getString(R.string.auth_url), null, params, null);
+            int result = NetworkMgr.post(getString(R.string.scan_url), null, params, null);
             Log.i(TAG, "Signature return value = " + result);
             
             if (result == 403)
@@ -76,6 +84,8 @@ public class ScanActivity extends Activity
                 Log.e(TAG, msg);
                 throw new EyerisException(msg);
             }
+            
+            go_to_url(getString(R.string.log_url) + subject + '/');
 
         }
         catch (EyerisException e)
