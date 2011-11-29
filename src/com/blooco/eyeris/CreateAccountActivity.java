@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -90,6 +91,14 @@ public class CreateAccountActivity extends Activity
 
                 et = (EditText) findViewById(R.id.create_password);
                 String pw = et.getText().toString();
+                
+                et = (EditText) findViewById(R.id.create_host);
+                String host = et.getText().toString();
+                
+                SharedPreferences settings = getSharedPreferences(getString(R.string.eyeris_pref), 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(getString(R.string.host_pref), host);
+                editor.commit();
 
                 validateParams(alias, pw);
 
@@ -152,7 +161,10 @@ public class CreateAccountActivity extends Activity
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("subject", subject);
         params.put("cert", certString);
-        int result = NetworkMgr.post(getString(R.string.register_url), null, params, null);
+        SharedPreferences settings = getSharedPreferences(getString(R.string.eyeris_pref), 0);
+        String hostname = settings.getString(getString(R.string.host_pref), "bogus");
+        String url = "http://" + hostname + getString(R.string.register_url);
+        int result = NetworkMgr.post(url, null, params, null);
         Log.i(TAG, "Register return value = " + result);
         if (result == 403)
         {

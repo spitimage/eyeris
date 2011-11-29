@@ -15,13 +15,14 @@ public final class R {
     }
     public static final class id {
         public static final int create_email=0x7f050000;
-        public static final int create_ok=0x7f050003;
+        public static final int create_host=0x7f050002;
+        public static final int create_ok=0x7f050004;
         public static final int create_password=0x7f050001;
-        public static final int linearLayout1=0x7f050002;
-        public static final int login_email=0x7f050004;
-        public static final int login_ok=0x7f050006;
-        public static final int login_password=0x7f050005;
-        public static final int scan_scan=0x7f050007;
+        public static final int linearLayout1=0x7f050003;
+        public static final int login_email=0x7f050005;
+        public static final int login_ok=0x7f050007;
+        public static final int login_password=0x7f050006;
+        public static final int scan_scan=0x7f050008;
     }
     public static final class layout {
         public static final int createaccount=0x7f030000;
@@ -34,7 +35,9 @@ public final class R {
         public static final int auth_url=0x7f040006;
         public static final int create_text=0x7f040003;
         public static final int create_text_h1=0x7f040002;
+        public static final int eyeris_pref=0x7f040009;
         public static final int hello=0x7f040000;
+        public static final int host_pref=0x7f04000a;
         public static final int log_url=0x7f040008;
         public static final int login_text=0x7f040004;
         public static final int register_url=0x7f040005;

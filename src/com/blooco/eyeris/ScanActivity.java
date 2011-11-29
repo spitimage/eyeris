@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -106,7 +107,12 @@ public class ScanActivity extends Activity
             params.put("subject", subject);
             params.put("content", content);
             params.put("signature", signature);
-            int result = NetworkMgr.post(getString(R.string.scan_url), null, params, null);
+            
+            SharedPreferences settings = getSharedPreferences(getString(R.string.eyeris_pref), 0);
+            String hostname = settings.getString(getString(R.string.host_pref), "combo");
+            String url = "http://" + hostname + getString(R.string.scan_url);
+
+            int result = NetworkMgr.post(url, null, params, null);
             Log.i(TAG, "Signature return value = " + result);
             
             if (result == 403)
@@ -123,7 +129,9 @@ public class ScanActivity extends Activity
                 throw new EyerisException(msg); 
             }
             
-            go_to_url(getString(R.string.log_url) + subject + '/');
+            url = "http://" + hostname + getString(R.string.log_url);
+
+            go_to_url(url + subject + '/');
 
         }
         catch (EyerisException e)

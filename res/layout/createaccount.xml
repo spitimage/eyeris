@@ -7,6 +7,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
         android:text="@string/create_text_h1" />
 
     <TextView
@@ -18,7 +20,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Email" />
+        android:text="Username" />
 
     <EditText
         android:id="@+id/create_email"
@@ -36,6 +38,17 @@
         android:layout_height="wrap_content"
         android:password="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Host" />
+
+    <EditText
+        android:id="@+id/create_host"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:password="false" />
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
@@ -47,6 +60,8 @@
             android:id="@+id/create_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="50sp"
+            android:paddingRight="50sp"
             android:text="Ok" />
     </LinearLayout>
 

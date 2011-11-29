@@ -5,10 +5,12 @@
     <string name="app_name">Eyeris</string>
     <string name="create_text_h1">Welcome To Eyeris!</string>
     <string name="create_text">To get started, enter your username and password. We\'ll encrypt them into your phone for later use.</string>
-    <string name="login_text">Go ahead and login fella</string>
-    <string name="register_url">http://192.168.1.100:8000/register/</string>
-    <string name="auth_url">http://192.168.1.100:8000/authorize/</string>
-    <string name="scan_url">http://192.168.1.100:8000/scan/</string>
-    <string name="log_url">http://192.168.1.100:8000/log/</string>
+    <string name="login_text">User Login</string>
+    <string name="register_url">/register/</string>
+    <string name="auth_url">/authorize/</string>
+    <string name="scan_url">/scan/</string>
+    <string name="log_url">/log/</string>
+    <string name="eyeris_pref">EYERIS_HOST</string>
+    <string name="host_pref">hostPref</string>
         
 </resources>
