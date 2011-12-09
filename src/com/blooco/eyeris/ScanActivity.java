@@ -42,6 +42,19 @@ public class ScanActivity extends Activity
 
         });
         
+        Button logout = (Button) findViewById(R.id.scan_logout);
+        logout.setOnClickListener(new OnClickListener()
+        {
+
+            public void onClick(View arg0)
+            {
+                signatureMgr = null;
+                Intent intent = new Intent(ScanActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+
+        });
+        
         startZxing();
         
     }
@@ -112,6 +125,7 @@ public class ScanActivity extends Activity
             String hostname = settings.getString(getString(R.string.host_pref), "combo");
             String url = "http://" + hostname + getString(R.string.scan_url);
 
+            error = true;
             int result = NetworkMgr.post(url, null, params, null);
             Log.i(TAG, "Signature return value = " + result);
             
@@ -129,6 +143,8 @@ public class ScanActivity extends Activity
                 throw new EyerisException(msg); 
             }
             
+            error = false;
+            
             url = "http://" + hostname + getString(R.string.log_url);
 
             go_to_url(url + subject + '/');
@@ -136,7 +152,6 @@ public class ScanActivity extends Activity
         }
         catch (EyerisException e)
         {
-            error = true;
             Bundle bundle = new Bundle();
             bundle.putString("message", e.getLocalizedMessage());
             removeDialog(0);
