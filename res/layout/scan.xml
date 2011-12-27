@@ -15,16 +15,16 @@
             android:id="@+id/scan_scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="50sp"
-            android:paddingRight="50sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
             android:text="Retry Scan" />
 
         <Button
             android:id="@+id/scan_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="50sp"
-            android:paddingRight="50sp"
+            android:paddingLeft="10sp"
+            android:paddingRight="10sp"
             android:text="Log Out" />
     </LinearLayout>
 

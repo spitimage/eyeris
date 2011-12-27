@@ -37,6 +37,7 @@ public class ScanActivity extends Activity
 
             public void onClick(View arg0)
             {
+                error = false;
                 startZxing();
             }
 
@@ -65,6 +66,7 @@ public class ScanActivity extends Activity
         {
             return;
         }
+        error = true;
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.initiateScan();
     }
@@ -92,13 +94,6 @@ public class ScanActivity extends Activity
         super.onActivityResult(requestCode, resultCode, intent);
     }
     
-    protected void go_to_url(String url)
-    {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        startActivity(intent);        
-    }
-
     protected void scan(String content)
     {
         try
@@ -125,7 +120,6 @@ public class ScanActivity extends Activity
             String hostname = settings.getString(getString(R.string.host_pref), "combo");
             String url = "http://" + hostname + getString(R.string.scan_url);
 
-            error = true;
             int result = NetworkMgr.post(url, null, params, null);
             Log.i(TAG, "Signature return value = " + result);
             
@@ -145,10 +139,6 @@ public class ScanActivity extends Activity
             
             error = false;
             
-            url = "http://" + hostname + getString(R.string.log_url);
-
-            go_to_url(url + subject + '/');
-
         }
         catch (EyerisException e)
         {
@@ -190,7 +180,6 @@ public class ScanActivity extends Activity
         {
             public void onClick(DialogInterface dialog, int which)
             {
-                error = false;
                 dialog.dismiss();
             }
         });
